@@ -1,0 +1,32 @@
+data:
+  source: openml
+  dataset_id: 40945
+  drop_columns:
+    - name
+    - ticket
+    - cabin
+    - body
+    - boat
+    - home.dest
+
+preprocessing:
+  fill_strategy:
+    age: median
+    fare: median
+    embarked: mode
+  encode:
+    sex:
+      male: 0
+      female: 1
+    embarked: onehot
+
+model:
+  type: RandomForestClassifier
+  params:
+    n_estimators: 100
+    max_depth: 5
+    random_state: 42
+
+training:
+  test_size: 0.2
+  random_state: 42

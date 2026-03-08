@@ -1,0 +1,15 @@
+service: "service:TitanicClassifierService"
+description: "Klasyfikator przeżycia Titanic (scikit-learn)"
+labels:
+  owner: SGGW
+  project: titanic_bentoml
+include:
+  - "*.py"
+python:
+  packages:
+    - scikit-learn
+    - numpy
+    - pandas
+    - pydantic
+models:
+  - titanic_classifier:latest

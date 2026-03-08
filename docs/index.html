@@ -1,0 +1,1362 @@
+<!doctype html>
+<html lang="pl">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Implementacja Systemów AI — Warsztaty SGGW</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/black.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+
+		<style>
+			.reveal .slides {
+				font-size: 0.8em;
+				text-align: left;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+<!-- ============================================================ -->
+<!-- SEKCJA 1: Paradygmat obiektowy w AI/ML                       -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# Paradygmat obiektowy w AI/ML
+
+Warsztaty SGGW — Implementacja Systemów AI
+
+---
+
+## Dlaczego OOP w ML?
+
+* Kod ML szybko staje się **nieczytelnym skryptem** — trudnym do utrzymania i rozwijania
+* Struktura obiektowa wymusza **separację odpowiedzialności** (dane, preprocessing, model, ewaluacja)
+* Dobrze zorganizowany kod jest **reprodukowalny** — inni mogą go uruchomić i zrozumieć
+* OOP ułatwia **testowanie** poszczególnych komponentów niezależnie
+* W produkcji kod ML musi być **niezawodny** — nie wystarczy notebook "który działa na moim laptopie"
+
+---
+
+## Dlaczego SOLID i CUPID?
+
+* **SOLID** pochodzi z oprogramowania korporacyjnego - nie wszystko pasuje do ML
+* **CUPID** (szczególnie Unix Philosophy i Composability) lepiej opisuje przepływ danych w systemach ML
+* Pokazujemy oba podejścia i krytycznie oceniamy każde z nich
+* Cel: unikanie ślepego kopiowania wzorców, które nie pasują do kontekstu ML
+
+---
+
+## Techniczne sposoby dzielenia kodu
+
+### OOP
+* moduły
+* klasy
+* metody i pola
+
+---
+
+### Funkcyjny
+* funkcje (def, lambda)
+* struktury danych (namedtuple, dict, list, tuple, dataclass)
+* funkcje wyższych rzędów (map, filter, reduce)
+
+---
+
+## Kryteria podziału kodu — SOLID
+
+* **S**ingle Responsibility Principle - jedna klasa, jedna odpowiedzialność
+* **O**pen-Closed Principle - otwarte na rozszerzanie, zamknięte na modyfikacje
+* **L**iskov Substitution Principle - obiekty klas pochodnych mogą zastępować obiekty klas bazowych
+
+---
+
+* **I**nterface Segregation Principle - wiele dedykowanych interfejsów zamiast jednego ogólnego
+* **D**ependency Inversion Principle - zależności od abstrakcji, nie konkretnych implementacji
+
+---
+
+## CUPID Properties
+
+Dan North - [CUPID—for joyful coding](https://dannorth.net/cupid-for-joyful-coding/)
+
+* **C**omposable - komponowalne, można je łączyć w większe systemy
+* **U**nix Philosophy - zgodne z filozofią Uniksa, robią jedną rzecz dobrze
+* **P**redictable - przewidywalne, zachowują się zgodnie z oczekiwaniami
+* **I**diomatic - zgodne z konwencjami języka
+* **D**omain-based - oparte na domenie, odzwierciedlają język biznesowy
+
+---
+
+## Unix Philosophy
+
+> This is the Unix philosophy: Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface.
+
+```bash
+cat README.md | grep "https" | sort | uniq
+```
+
+---
+
+## SOLID w kontekście ML
+
+* **S**ingle Responsibility Principle
+  * Działa dobrze na poziomie funkcji i klas
+  * Niekoniecznie na poziomie całych potoków ML
+
+* **O**pen-Closed Principle
+  * W ML często lepiej po prostu zmienić kod transformacji
+  * Nadmierna abstrakcja ogranicza czytelność kodu
+
+---
+
+* **L**iskov Substitution Principle
+  * Bardzo przydatne! Możemy zamieniać komponenty nie wpływając na konsumentów
+  * Przykład: wymiana implementacji feature engineeringu bez zmian w kolejnych krokach
+
+---
+
+* **I**nterface Segregation Principle
+  * Często niepraktyczne w ML - prowadzi do duplikacji obliczeń
+  * Lepiej policzyć wszystkie wyniki raz i wybrać potrzebne
+
+---
+
+* **D**ependency Inversion Principle
+  * Zbyt skomplikowane dla większości potoków ML
+  * Overengineering w kontekście transformacji danych
+
+---
+
+## CUPID w kontekście ML
+
+* **C**omposable - komponowalne
+  * Dane wyjściowe jednego kroku są wejściowymi dla następnego
+  * Naturalna cecha potoków danych
+
+* **U**nix Philosophy - filozofia Uniksa
+  * Każdy komponent robi jedną rzecz dobrze
+  * Wyjście jednego programu staje się wejściem dla innego
+
+---
+
+* **P**redictable - przewidywalne
+  * Deterministyczne, testowalne zachowanie
+  * Automatyczne testy jako kluczowy element
+
+* **I**diomatic - idiomatyczne
+  * Zgodne z konwencjami i najlepszymi praktykami Pythona
+  * Wykorzystanie bibliotek i narzędzi ekosystemu Python
+  * Nie próbujemy zamieniać Pythona w Javę... lub Haskella
+
+---
+
+* **D**omain-based - oparte na domenie
+  * Używanie terminologii biznesowej w kodzie
+  * Logiki domenowej w dedykowanych funkcjach i strukturach danych
+  * Wewnątrz kodu ML: proste typy danych (string, float, int)
+  * Publiczne API: typy domenowe (klasy, enum)
+
+---
+
+## Filozofia Unix w ML
+
+"Make each program do one thing well. (...) Expect the output of every program to become the input to another."
+
+* Pipeline ML jako łańcuch małych, specjalizowanych komponentów
+* Każdy komponent ma jasno zdefiniowane wejście i wyjście
+* Komponenty można łączyć w różne konfiguracje
+
+---
+
+## Wzorzec scikit-learn: fit / transform / predict
+
+```python
+class TitanicPreprocessor:
+    """Preprocessor zgodny z interfejsem sklearn."""
+
+    def fit(self, X, y=None):
+        """Naucz się parametrów (np. mediany, wartości modalne)."""
+        self.age_median_ = X["age"].median()
+        self.fare_median_ = X["fare"].median()
+        self.embarked_mode_ = X["embarked"].mode()[0]
+        return self
+
+    def transform(self, X):
+        """Zastosuj nauczone parametry do nowych danych."""
+        X = X.copy()
+        X["age"] = X["age"].fillna(self.age_median_)
+        X["fare"] = X["fare"].fillna(self.fare_median_)
+        X["embarked"] = X["embarked"].fillna(self.embarked_mode_)
+        return X
+```
+
+* `fit()` — uczy się na danych treningowych
+* `transform()` — stosuje transformację
+* `predict()` — generuje predykcje (dla modeli)
+
+---
+
+## Zarządzanie strukturą projektu
+
+---
+
+## Dlaczego struktura projektu jest ważna?
+
+* Ułatwia **współpracę** w zespole
+* Zapewnia **powtarzalność** eksperymentów
+* Pozwala **śledzić zmiany** w czasie
+* Oddziela **kod od danych**
+* Umożliwia **testowanie** komponentów
+* Usprawnia **wdrażanie** do produkcji
+
+---
+
+## Dlaczego taki układ katalogów?
+
+* **data/** oddzielone od **src/** → surowe dane nigdy nie są modyfikowane
+* **notebooks/** oddzielone od **src/** → prototypy nie trafiają do produkcji
+* **models/** jako osobny katalog → modele to wersjonowane artefakty
+* **config/** oddzielone od kodu → zmiana parametrów bez edycji kodu
+* Separacja wg cyklu życia, nie wg funkcji
+
+---
+
+## Przykładowa Struktura Projektu ML
+
+```
+projekt_ml/
+├── data/               # Wszystkie dane projektu
+│   ├── raw/            # Niezmienione, oryginalne dane
+│   ├── processed/      # Dane po wstępnym przetworzeniu
+│   ├── interim/        # Dane pośrednie
+│   └── external/       # Dane z zewnętrznych źródeł
+├── models/             # Wytrenowane modele i artefakty
+├── notebooks/          # Jupyter notebooks (eksploracja, prototypy)
+├── src/                # Kod źródłowy aplikacji
+├── tests/              # Testy jednostkowe i integracyjne
+├── config/             # Pliki konfiguracyjne
+├── docs/               # Dokumentacja
+├── reports/            # Wyniki eksperymentów
+└── README.md           # Opis projektu
+```
+
+---
+
+## Zarządzanie Danymi
+
+* **Raw data** (surowe dane)
+  * Nigdy nie modyfikuj!
+  * Zapisuj metadane (skąd, kiedy, wersja)
+
+* **Processed data** (przetworzone dane)
+  * Oczyszczone, przekształcone
+  * Gotowe do modelowania
+  * Zachowuj ścieżkę przetwarzania
+
+---
+
+* **Interim data** (dane pośrednie)
+  * Przydatne dla długich pipeline'ów
+  * Checkpointy przetwarzania
+  * Łatwiejsze debugowanie
+
+* **External data** (dane zewnętrzne)
+  * Dane referencyjne
+  * Dane do wzbogacania głównego zbioru
+  * Benchmarki
+
+---
+
+## Organizacja kodu
+
+```
+src/
+├── __init__.py
+├── data/                 # Skrypty do przetwarzania danych
+│   ├── __init__.py
+│   ├── make_dataset.py
+│   └── preprocess.py
+├── features/             # Feature engineering
+│   ├── __init__.py
+│   └── build_features.py
+├── models/               # Definicje modeli, trening
+│   ├── __init__.py
+│   ├── train_model.py
+│   └── predict_model.py
+├── visualization/        # Wizualizacje
+└── utils/                # Narzędzia pomocnicze
+```
+
+---
+
+## Modularyzacja Projektu
+
+* **Moduły wg funkcjonalności**
+  * Data processing
+  * Feature engineering
+  * Model training
+  * Evaluation
+
+* **Moduły wg przepływu danych**
+  * Preprocessing → Training → Inference → Monitoring
+
+---
+
+## Notebooks vs. Kod Źródłowy
+
+**Notebooks (`/notebooks`)**
+* Eksploracja danych
+* Prototypowanie
+* Wizualizacja
+* Prezentacja wyników
+
+**Kod źródłowy (`/src`)**
+* Przetwarzanie danych
+* Implementacja modeli
+* Produkcyjna logika biznesowa
+* Komponenty wielokrotnego użytku
+
+---
+
+## Sekcja 1 — Materiały
+
+* **Przykład**: `examples/01_oop_ml/` — porównanie "bałaganu" w notebooku vs. czysta struktura OOP
+
+</textarea></section>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEKCJA 2: Zarządzanie eksperymentami — MLflow Tracking       -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# Zarządzanie eksperymentami z MLflow
+
+---
+
+## Dlaczego zarządzanie eksperymentami?
+
+* Ile razy zdarzyło się: "ten model działał lepiej wczoraj, ale nie pamiętam parametrów"?
+* Ręczne notatki i arkusze kalkulacyjne **nie skalują się**
+* Bez systemu śledzenia tracimy **reprodukowalność** — nie da się wrócić do najlepszego wyniku
+* Systemy eksperymentów pozwalają **porównywać** setki konfiguracji w jednym miejscu
+* MLflow jest standardem branżowym
+
+---
+
+## Wprowadzenie: Problem eksperymentów ML
+
+- Jak śledzić parametry modeli?
+- Jak porównywać wyniki różnych wersji?
+- Jak zapewnić reprodukowalność?
+- Jak dzielić się wynikami w zespole?
+- Jak zarządzać wieloma wersjami modeli?
+
+---
+
+## Dlaczego MLflow?
+
+* Najpopularniejsza platforma open-source do śledzenia eksperymentów
+* Niezależna od frameworków ML (sklearn, pytorch, tensorflow...)
+* Kompletne zarządzanie cyklem życia modelu: śledzenie → pakowanie → rejestr → wdrożenie
+* Pokazujemy wszystkie 4 komponenty (Tracking, Projects, Models, Registry) bo tworzą kompletny workflow
+
+---
+
+## MLflow - platforma do zarządzania cyklem życia ML
+
+- Open-source
+- Niezależna od bibliotek ML
+- Modularna architektura
+- Prosta integracja
+- Wspiera Python, R, Java i inne języki
+
+---
+
+## Główne komponenty MLflow
+
+- **MLflow Tracking** - śledzenie eksperymentów i wyników
+- **MLflow Projects** - pakowanie kodu ML
+- **MLflow Models** - pakowanie modeli ML
+- **MLflow Model Registry** - zarządzanie cyklem życia modeli (wersjonowanie, deployment)
+
+---
+
+## MLflow Tracking
+
+- Śledzenie parametrów modelu
+- Rejestrowanie metryk wydajności
+- Zapisywanie artefaktów (wykresy, pliki)
+- Organizacja eksperymentów
+- Interfejs użytkownika (UI) do analizy
+
+---
+
+## Instalacja i konfiguracja
+
+```bash
+# Instalacja
+pip install mlflow
+
+# Uruchomienie serwera UI
+mlflow ui
+```
+
+Domyślny adres: http://localhost:5000
+
+---
+
+## Podstawowa struktura kodu z MLflow
+
+```python
+import mlflow
+
+# Rozpocznij eksperyment
+mlflow.set_experiment("Nazwa eksperymentu")
+
+with mlflow.start_run():
+    # Zaloguj parametry
+    mlflow.log_param("param1", value1)
+
+    # Zaloguj metryki
+    mlflow.log_metric("accuracy", accuracy)
+
+    # Zapisz model
+    mlflow.sklearn.log_model(model, "model")
+
+    # Zapisz artefakt
+    mlflow.log_artifact("plik.png")
+```
+
+---
+
+## Śledzenie eksperymentów w praktyce
+
+```python
+import mlflow
+import mlflow.sklearn
+from sklearn.ensemble import RandomForestClassifier
+
+with mlflow.start_run(run_name="Eksperyment RF"):
+    # Parametry
+    params = {"n_estimators": 100, "max_depth": 5}
+    mlflow.log_params(params)
+
+    # Trenowanie modelu
+    rf = RandomForestClassifier(**params, random_state=42)
+    rf.fit(X_train, y_train)
+
+    # Logowanie wyników
+    train_score = rf.score(X_train, y_train)
+    test_score = rf.score(X_test, y_test)
+
+    mlflow.log_metric("train_accuracy", train_score)
+    mlflow.log_metric("test_accuracy", test_score)
+
+    # Zapisanie modelu
+    mlflow.sklearn.log_model(rf, "model")
+```
+
+---
+
+## Zapisywanie własnych metryk
+
+```python
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+
+# Obliczenie różnych metryk
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+
+# Logowanie metryk
+mlflow.log_metric("accuracy", accuracy)
+mlflow.log_metric("f1_score", f1)
+mlflow.log_metric("precision", precision)
+mlflow.log_metric("recall", recall)
+```
+
+---
+
+## Zapisywanie artefaktów
+
+```python
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# Tworzenie wykresu macierzy pomyłek
+cm = confusion_matrix(y_test, y_pred)
+disp = ConfusionMatrixDisplay(cm, display_labels=["Nie przeżył", "Przeżył"])
+disp.plot()
+plt.title("Macierz pomyłek — Titanic")
+
+# Zapisanie wykresu
+plt.savefig("confusion_matrix.png")
+mlflow.log_artifact("confusion_matrix.png")
+```
+
+---
+
+## Ładowanie modelu z MLflow
+
+```python
+# Bezpośrednio po eksperymencie
+model_uri = mlflow.get_artifact_uri("model")
+loaded_model = mlflow.sklearn.load_model(model_uri)
+
+# Lub z konkretnego eksperymentu
+run_id = "abcdef123456789"
+model_uri = f"runs:/{run_id}/model"
+loaded_model = mlflow.sklearn.load_model(model_uri)
+
+# Z Model Registry
+model_name = "TitanicSurvivalModel"
+version = 2
+model = mlflow.sklearn.load_model(
+    f"models:/{model_name}/{version}"
+)
+```
+
+---
+
+## Sekcja 2 — Materiały
+
+* **Przykład**: `examples/02_mlflow_tracking/` — śledzenie eksperymentów z RandomForest i LogisticRegression
+* **Zadanie**: `assignments/02_mlflow_experiments/` — trenuj 3+ modele i śledź w MLflow (30 min)
+
+</textarea></section>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEKCJA 3: MLflow Projects                                    -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# MLflow Projects
+
+---
+
+## Dlaczego struktura projektu MLflow?
+
+* "Działa na moim komputerze" to **nie jest reprodukowalność**
+* MLflow Projects definiują **jednolity format** pakowania kodu ML
+* Każdy może uruchomić projekt jedną komendą — **bez zgadywania** zależności
+* Wersjonowanie środowiska razem z kodem zapewnia **spójność** wyników
+* Format Projects integruje się z MLflow Tracking — wyniki są automatycznie śledzone
+
+---
+
+## MLflow Projects
+
+- Format do pakowania kodu ML
+- Definicja środowiska (virtualenv, python_env)
+- Parametryzowane punkty wejścia
+- Reprodukowalność w różnych środowiskach
+
+---
+
+## Struktura projektu MLflow
+
+```
+projekt-ml/
+├── MLproject           # Definicja projektu
+├── python_env.yaml     # Środowisko Python
+├── requirements.txt    # Zależności pip
+├── train.py            # Skrypt treningowy
+└── evaluate.py         # Skrypt ewaluacyjny
+```
+
+---
+
+## Plik MLproject
+
+```yaml
+name: titanic-classifier
+
+python_env: python_env.yaml
+
+entry_points:
+  main:
+    parameters:
+      n_estimators: {type: int, default: 100}
+      max_depth: {type: int, default: 5}
+      random_state: {type: int, default: 42}
+    command: >
+      python train.py
+        --n-estimators {n_estimators}
+        --max-depth {max_depth}
+        --random-state {random_state}
+```
+
+---
+
+## Plik python_env.yaml
+
+```yaml
+python: "3.10"
+build_dependencies:
+  - pip
+  - setuptools
+dependencies:
+  - -r requirements.txt
+```
+
+* Używamy `python_env` zamiast `conda_env` — lżejsze i kompatybilne z **uv**
+* MLflow automatycznie tworzy virtualenv z określoną wersją Pythona
+
+---
+
+## Uruchamianie projektu MLflow
+
+```bash
+# Lokalne uruchomienie
+mlflow run . -P n_estimators=100 -P max_depth=5
+
+# Uruchomienie z GitHub
+mlflow run https://github.com/user/projekt-ml -P n_estimators=200
+
+# Uruchomienie bez tworzenia nowego środowiska
+mlflow run . --env-manager local -P n_estimators=100
+```
+
+---
+
+## Sekcja 3 — Materiały
+
+* **Przykład**: `examples/03_mlflow_projects/` — projekt MLflow z Titanikiem, python_env i parametryzowanymi entry points
+* **Zadanie**: `assignments/03_mlflow_projects/` — opakuj skrypt treningowy w MLflow Project (20 min)
+
+</textarea></section>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEKCJA 4: Produkcyjne potoki ML — DVC Pipelines              -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# Produkcyjne potoki ML — DVC Pipelines
+
+---
+
+## Dlaczego DVC Pipelines?
+
+* Skrypty uruchamiane ręcznie to **przepis na błędy** — pomijasz krok, zmieniasz dane bez przeliczenia modelu
+* Pipeline definiuje **jawne zależności** między krokami — zawsze wiesz, co od czego zależy
+* DVC automatycznie **wykrywa zmiany** i przelicza tylko to, co trzeba
+* Parametryzacja przez `params.yaml` pozwala **eksperymentować bez zmian w kodzie**
+* Pipeline + Git = pełna **historia eksperymentów** i reprodukowalność
+
+---
+
+## Problem: Wersjonowanie w ML
+
+- Kod to tylko część projektu ML
+- Dane są często **duże** (GB/TB)
+- Dane i modele **zmieniają się** w czasie
+- Git nie radzi sobie z dużymi plikami
+- Trudno śledzić, która wersja kodu współpracuje z którą wersją danych
+
+---
+
+## Typowe sytuacje
+
+- "Ten model osiągnął 95% dokładności, ale nie pamiętam, na jakiej wersji danych był trenowany"
+- "Czy możesz mi wysłać dane, które używałeś w tym eksperymencie?"
+- "Mój model daje inne wyniki niż wczoraj, ale nie zmieniałem kodu..."
+- "Nie mogę zreprodukować twoich wyników"
+
+---
+
+## Dlaczego DVC?
+
+* **Git** świetnie śledzi kod, ale nie radzi sobie z dużymi plikami danych i modeli
+* **DVC** integruje się bezproblemowo z Git (pliki .dvc zamiast danych w repo)
+* Obsługuje dowolny backend (S3, GCS, Azure, lokalny dysk)
+* **Potoki DVC** = reprodukowalny, inkrementalny workflow (tylko zmienione etapy są ponownie wykonywane)
+* Dlaczego nie Git LFS? → brak potoków, eksperymentów, integracji z ML workflow
+
+---
+
+## Data Version Control (DVC)
+
+- Open-source system do wersjonowania **danych, modeli i eksperymentów**
+- Zbudowany **na bazie Git**
+- Śledzi **zależności** między kodem, danymi i wynikami
+- Zapewnia **reprodukowalność** eksperymentów
+- Umożliwia tworzenie **powtarzalnych potoków**
+- Działa z **dowolnymi** magazynami danych (S3, GCS, Azure, SSH, itd.)
+
+---
+
+## Jak działa DVC?
+
+- Pliki .dvc zawierają metadane (md5 hashes)
+- Faktyczne dane są przechowywane w cache i zdalnym magazynie
+- Git śledzi pliki .dvc
+
+---
+
+## Instalacja DVC
+
+```bash
+# Instalacja podstawowa
+pip install dvc
+
+# Z obsługą konkretnych magazynów
+pip install dvc[s3]     # dla AWS S3
+pip install dvc[gs]     # dla Google Cloud Storage
+pip install dvc[azure]  # dla Azure Blob Storage
+
+# Inicjalizacja w projekcie git
+git init
+dvc init
+git add .dvc .dvcignore
+git commit -m "Initialize DVC"
+```
+
+---
+
+## Śledzenie danych
+
+```bash
+# Dodanie pojedynczego pliku
+dvc add data/dataset.csv
+
+# Co się dzieje?
+# 1. Utworzenie dataset.csv.dvc (metadane)
+# 2. Dodanie dataset.csv do .gitignore
+# 3. Kopiowanie danych do .dvc/cache
+
+# Dodanie pliku .dvc do Git
+git add data/dataset.csv.dvc data/.gitignore
+git commit -m "Add dataset"
+```
+
+---
+
+## Potoki DVC (Pipelines)
+
+- **Reprodukowalne** przepływy pracy
+- **Automatyczne** wykrywanie zmian
+- **Inkrementalne** przetwarzanie (wykonywanie tylko niezbędnych etapów)
+- **Parametryzowane** eksperymenty
+- **Śledzenie** metryk i wykresów
+
+---
+
+## Plik dvc.yaml
+
+```yaml
+stages:
+  download_data:
+    cmd: python src/download_data.py
+    deps:
+      - src/download_data.py
+    outs:
+      - data/titanic.csv
+
+  prepare_data:
+    cmd: python src/prepare_data.py
+    deps:
+      - src/prepare_data.py
+      - data/titanic.csv
+    params:
+      - test_size
+      - random_state
+    outs:
+      - data/train.csv
+      - data/test.csv
+
+  train_model:
+    cmd: python src/train_model.py
+    deps:
+      - src/train_model.py
+      - data/train.csv
+      - data/test.csv
+    params:
+      - n_estimators
+      - max_depth
+    outs:
+      - models/model.pkl
+    metrics:
+      - metrics.json:
+          cache: false
+```
+
+---
+
+## Uruchamianie potoków
+
+```bash
+# Uruchomienie całego potoku
+dvc repro
+
+# Uruchomienie konkretnego etapu
+dvc repro train_model
+
+# Wyświetlenie zależności (DAG)
+dvc dag
+```
+
+---
+
+## Parametryzacja potoków
+
+```yaml
+# params.yaml
+test_size: 0.2
+random_state: 42
+n_estimators: 100
+max_depth: 5
+```
+
+```python
+# W kodzie Python
+import yaml
+
+with open("params.yaml") as f:
+    params = yaml.safe_load(f)
+
+n_estimators = params["n_estimators"]
+max_depth = params["max_depth"]
+```
+
+---
+
+## Śledzenie zmian
+
+```bash
+# Sprawdzenie statusu
+dvc status
+
+# Wyświetlenie zmian w danych
+dvc diff
+
+# Porównanie metryk
+dvc metrics show
+dvc metrics diff
+```
+
+---
+
+## Sekcja 4 — Materiały
+
+* **Przykład**: `examples/04_dvc_pipeline/` — 3-etapowy pipeline DVC z danymi Titanic
+* **Zadanie**: `assignments/04_dvc_pipeline/` — budowa 4-etapowego pipeline'u DVC (45 min)
+
+</textarea></section>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEKCJA 5: Odtwarzalność i wersjonowanie danych               -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# Odtwarzalność i wersjonowanie danych
+
+---
+
+## Dlaczego wersjonowanie danych?
+
+* Model jest **bezwartościowy** bez informacji o danych, na których był trenowany
+* Zmiana danych bez śledzenia to **cichy błąd** — wyniki się zmieniają, a nikt nie wie dlaczego
+* Wersjonowanie danych pozwala **odtworzyć każdy eksperyment** dokładnie
+* Integracja DVC z MLflow daje **kompletny obraz**: kod + dane + parametry + metryki + model
+* W zespole wersjonowanie danych umożliwia **współpracę** bez chaosu "wyślij mi swoje dane"
+
+---
+
+## Metryki i wykresy
+
+```bash
+# Wyświetlenie metryk
+dvc metrics show
+
+# Porównanie metryk między wersjami
+dvc metrics diff HEAD HEAD~1
+
+# Generowanie wykresów
+dvc plots show plots/confusion_matrix.csv --template confusion
+
+# Porównanie wykresów między wersjami
+dvc plots diff HEAD HEAD~1 plots/accuracy.csv --template scatter
+```
+
+---
+
+## Eksperymenty DVC
+
+```bash
+# Uruchomienie eksperymentu z modyfikacją parametrów
+dvc exp run --set-param n_estimators=200
+
+# Wyświetlenie eksperymentów
+dvc exp show
+
+# Porównanie eksperymentów
+dvc exp diff exp-1a2b3c exp-4d5e6f
+
+# Zastosowanie eksperymentu (zapis parametrów w params.yaml)
+dvc exp apply exp-1a2b3c
+```
+
+---
+
+## Zalety eksperymentów DVC
+
+- Brak potrzeby commitowania każdego eksperymentu
+- Szybkie testowanie różnych parametrów
+- Łatwe porównywanie wyników
+- Możliwość powrotu do poprzednich eksperymentów
+- Integracja z potokami DVC
+
+---
+
+## Integracja DVC z MLflow
+
+```python
+import mlflow
+import yaml
+
+# Ustawienie eksperymentu
+mlflow.set_experiment("DVC-Experiment")
+
+# Odczyt parametrów z DVC
+with open("params.yaml") as f:
+    params = yaml.safe_load(f)
+
+# Trening modelu z śledzeniem MLflow
+with mlflow.start_run():
+    # Logowanie parametrów z DVC
+    for key, value in params.items():
+        mlflow.log_param(key, value)
+
+    # Trenowanie modelu...
+    # model.fit(X_train, y_train)
+
+    # Logowanie metryk w MLflow
+    mlflow.log_metric("accuracy", accuracy)
+
+    # Zapisanie modelu w MLflow
+    mlflow.sklearn.log_model(model, "model")
+
+    # Zapisanie również dla DVC
+    import json
+    with open("metrics.json", "w") as f:
+        json.dump({"accuracy": accuracy}, f)
+```
+
+---
+
+## Współpraca przy użyciu DVC
+
+- **Współdzielenie danych** między członkami zespołu
+- **Zdalny cache** dla szybkiego dostępu
+- **Importowanie danych** z innych projektów
+- **Śledzenie eksperymentów** zespołu
+- **Udostępnianie modeli** i wyników
+
+```bash
+# Importowanie danych z innego projektu
+dvc import https://github.com/username/project dataset.csv
+
+# Aktualizacja zaimportowanych danych
+dvc update dataset.csv.dvc
+```
+
+---
+
+## Typowa struktura projektu z DVC
+
+```
+projekt-ml/
+├── .git/                  # Repozytorium Git
+├── .dvc/                  # Konfiguracja DVC
+├── data/
+│   ├── raw/               # Surowe dane
+│   └── processed/         # Przetworzone dane
+├── src/                   # Kod źródłowy
+├── models/                # Modele
+├── metrics/               # Metryki
+├── dvc.yaml               # Definicja potoku
+├── params.yaml            # Parametry
+└── requirements.txt       # Zależności
+```
+
+---
+
+## DVC vs. inne narzędzia
+
+| Narzędzie   | Wersjonowanie danych | Potoki | Eksperymenty | Integracja z Git |
+|-------------|----------------------|--------|--------------|------------------|
+| **DVC**     | ✅                  | ✅     | ✅          | ✅               |
+| Git LFS     | ✅                  | ❌     | ❌          | ✅               |
+| MLflow      | ❌                  | ❌     | ✅          | ❌               |
+| Pachyderm   | ✅                  | ✅     | ❌          | ❌               |
+| Kubeflow    | ❌                  | ✅     | ❌          | ❌               |
+
+</textarea></section>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEKCJA 6: Optymalizacja hiperparametrów — Optuna + MLflow     -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# Optymalizacja hiperparametrów — Optuna + MLflow
+
+---
+
+## Dlaczego optymalizacja hiperparametrów?
+
+* Ręczne dobieranie parametrów to **zgadywanka** — nie skaluje się przy wielu hiperparametrach
+* Grid Search sprawdza **wszystkie kombinacje** — kosztowne wykładniczo (O(m^n))
+* Random Search jest lepszy, ale **nie uczy się** z poprzednich prób
+* **Optuna** używa optymalizacji bayesowskiej — inteligentnie wybiera kolejne próby
+* Integracja z MLflow daje **pełną historię** każdej próby
+
+---
+
+## Optuna — inteligentna optymalizacja
+
+* **Bayesowska optymalizacja** — model zastępczy (surrogate) przewiduje najlepsze parametry
+* **Pruning** — automatyczne odcinanie słabych prób w trakcie ewaluacji
+* **Integracja z MLflow** — każda próba logowana automatycznie
+* Framework-agnostic — działa z sklearn, PyTorch, TensorFlow...
+
+---
+
+## Kluczowe koncepcje Optuna
+
+* **Trial** — pojedyncza próba z zestawem hiperparametrów
+* **Study** — seria prób z jednym celem (minimize/maximize)
+* **Objective** — funkcja celu, którą optymalizujemy
+* **Sampler** — strategia wybierania parametrów (domyślnie TPE)
+* **Pruner** — strategia odcinania słabych prób
+
+---
+
+## Definiowanie przestrzeni parametrów
+
+```python
+def objective(trial):
+    # Liczby całkowite
+    n_estimators = trial.suggest_int("n_estimators", 50, 300, step=50)
+    max_depth = trial.suggest_int("max_depth", 3, 15)
+
+    # Liczby zmiennoprzecinkowe
+    learning_rate = trial.suggest_float("learning_rate", 0.01, 0.3, log=True)
+
+    # Kategoryczne
+    criterion = trial.suggest_categorical("criterion", ["gini", "entropy"])
+```
+
+---
+
+## Funkcja celu (objective)
+
+```python
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    n_estimators = trial.suggest_int("n_estimators", 50, 300, step=50)
+    max_depth = trial.suggest_int("max_depth", 3, 15)
+    min_samples_split = trial.suggest_int("min_samples_split", 2, 10)
+
+    model = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        random_state=42,
+    )
+
+    scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
+    return scores.mean()
+```
+
+---
+
+## Integracja z MLflow
+
+```python
+from optuna.integration.mlflow import MLflowCallback
+
+mlflow.set_experiment("titanic-optuna")
+
+mlflow_callback = MLflowCallback(
+    tracking_uri=mlflow.get_tracking_uri(),
+    metric_name="cv_accuracy",
+)
+
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=15, callbacks=[mlflow_callback])
+```
+
+Każda próba → osobny run w MLflow z parametrami i metryką.
+
+---
+
+## Najlepszy model
+
+```python
+# Najlepsze parametry
+print(study.best_params)   # {'n_estimators': 200, 'max_depth': 7, ...}
+print(study.best_value)    # 0.8234
+
+# Trening i logowanie najlepszego modelu
+best_model = RandomForestClassifier(**study.best_params, random_state=42)
+best_model.fit(X_train, y_train)
+
+with mlflow.start_run(run_name="best-model"):
+    mlflow.log_params(study.best_params)
+    mlflow.log_metric("cv_accuracy", study.best_value)
+    mlflow.log_metric("test_accuracy", best_model.score(X_test, y_test))
+    mlflow.sklearn.log_model(best_model, "model", signature=signature)
+```
+
+---
+
+## Sekcja 6 — Materiały
+
+* **Przykład**: `examples/07_optuna/` — optymalizacja hiperparametrów Optuna + MLflow na danych Titanic
+* **Zadanie**: `assignments/05_optuna_mlflow/` — optymalizuj hiperparametry z Optuna i MLflow (30 min)
+
+</textarea></section>
+</section>
+
+<!-- SEKCJA 7: BentoML — Wdrażanie modeli jako API -->
+<section>
+<section data-markdown><textarea data-template>
+# BentoML — Wdrażanie modeli jako API
+
+Warsztaty SGGW — Implementacja Systemów AI
+
+---
+
+## Dlaczego serwowanie modeli?
+
+* Zarejestrowany model (Model Registry) trzeba **udostępnić** jako usługę — API REST lub gRPC
+* **BentoML** standaryzuje pakowanie modeli i wystawianie endpointów (pojedyncze i wsadowe)
+* Ułatwia **wdrażanie** w kontenerach Docker i w chmurze
+* Na warsztacie: od trenowania na Titanic do działającego API w kilku krokach
+
+---
+
+## Czym jest BentoML?
+
+* Framework do **pakowania** i **wdrażania** modeli ML jako serwisów
+* Umożliwia **standaryzację** procesu deploymentu modeli
+* Wspiera **różne frameworki ML** (scikit-learn, PyTorch, TensorFlow, XGBoost...)
+* Zapewnia **automatyczne API** (REST, gRPC)
+* Obsługuje **przetwarzanie wsadowe** dla wydajności
+* Integruje się z **kontenerami Docker** i **Kubernetes**
+
+---
+
+## Architektura BentoML
+
+* **Model Store** — repozytorium modeli
+* **Service** — klasa serwisu API (dekorator, ładowanie modelu)
+* **Bento** — pakiet z modelem, serwisem i zależnościami
+* **Server** — serwer obsługujący żądania API
+
+---
+
+## Trenowanie i zapisywanie modelu (Titanic)
+
+```python
+import bentoml
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+model_tag = bentoml.sklearn.save_model(
+    "titanic_classifier",
+    model,
+    signatures={"predict": {"batchable": True}, "predict_proba": {"batchable": True}},
+    metadata={"accuracy": model.score(X_test, y_test)}
+)
+```
+
+---
+
+## Serwis BentoML — pojedyncza i wsadowa predykcja
+
+* Endpoint **predict** — jedna próbka (np. cechy pasażera Titanic)
+* Endpoint **predict_batch** — wiele próbek naraz (wydajność)
+* Walidacja wejścia (np. Pydantic)
+* Serwis uruchamiany lokalnie: `bentoml serve service:NazwaSerwisu`
+
+---
+
+## Uruchomienie i testowanie API
+
+* Serwis dostępny pod `http://localhost:3000`
+* Dokumentacja Swagger: `http://localhost:3000/docs`
+* Opcjonalnie: `bentoml build` i `bentoml containerize` — obraz Docker
+
+---
+
+## Sekcja 7 — Materiały
+
+* **Przykład**: `examples/06_bentoml/` — trening modelu Titanic, zapis w BentoML, serwis z endpointami predict i predict_batch
+* **Zadanie**: `assignments/06_bentoml/` — zbuduj serwis BentoML z dwoma modelami (30 min)
+
+</textarea></section>
+</section>
+
+<!-- ============================================================ -->
+<!-- SEKCJA 8: Projekt końcowy — Palmer Penguins end-to-end        -->
+<!-- ============================================================ -->
+<section>
+<section data-markdown><textarea data-template>
+# Projekt końcowy
+
+Palmer Penguins — end-to-end pipeline
+
+---
+
+## Zbiór danych — Palmer Penguins
+
+**OpenML id: 42585** — klasyfikacja 3 gatunków pingwinów
+
+| Gatunek | Opis |
+|---------|------|
+| Adelie | Najliczniejszy gatunek |
+| Chinstrap | Charakterystyczny "pasek" na brodzie |
+| Gentoo | Największy z trzech gatunków |
+
+**Cechy numeryczne:** `culmen_length_mm`, `culmen_depth_mm`, `flipper_length_mm`, `body_mass_g`
+
+**Cechy kategoryczne:** `island` (3 wyspy), `sex` (MALE/FEMALE)
+
+---
+
+## Preprocessing — różnice vs. Titanic
+
+| | Titanic | Penguins |
+|---|---------|----------|
+| Brakujące wartości | Imputacja (mediana, moda) | `dropna()` |
+| Kodowanie kategoryczne | `pd.get_dummies` | `OneHotEncoder` (zapisany jako `encoder.pkl`) |
+| Problem | Binarny (survived) | Wieloklasowy (3 gatunki) |
+| Metryka F1 | `f1_score(y, ŷ)` | `f1_score(y, ŷ, average="weighted")` |
+
+Encoder musi być **zapisany i współdzielony** między etapami pipeline'u i serwisem BentoML.
+
+---
+
+## Pipeline — 5 etapów DVC
+
+```
+params.yaml
+    │
+    v
+[download_data] ──→ data/penguins.csv
+    │
+    v
+[prepare_data] ──→ data/train.csv, data/test.csv, models/encoder.pkl
+    │
+    v
+[train_model] ──→ models/model.pkl  (Optuna → MLflow)
+    │
+    v
+[evaluate] ──→ metrics.json  (best-model → MLflow)
+    │
+    v
+[register_bentoml] ──→ BentoML store
+    │
+    v
+(manual) bentoml serve service:PenguinsService
+```
+
+---
+
+## Etap 3: train_model — Optuna + MLflow
+
+* Funkcja celu z 4 hiperparametrami (`n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`)
+* `cross_val_score` (5-fold) jako metryka
+* `MLflowCallback` — automatyczne logowanie prób
+* Eksperyment: `"penguins-optuna"`, ≥ 20 prób
+* Najlepszy model zapisany do `models/model.pkl`
+
+---
+
+## Etap 4–5: evaluate + register_bentoml
+
+**evaluate:**
+* Metryki: `accuracy` + `f1_score(average="weighted")`
+* Zapis do `metrics.json` (DVC metrics)
+* MLflow run `"best-model"` z parametrami, metrykami i modelem z sygnaturą
+
+**register_bentoml:**
+* `bentoml.sklearn.save_model("penguins_classifier", model)`
+* `bentoml.sklearn.save_model("penguins_encoder", encoder)`
+* Log rejestracji do MLflow
+
+---
+
+## Serwis BentoML — /predict
+
+```python
+class PenguinFeatures(BaseModel):
+    culmen_length_mm: float
+    culmen_depth_mm: float
+    flipper_length_mm: float
+    body_mass_g: float
+    sex: str      # "MALE" / "FEMALE"
+    island: str   # "Biscoe" / "Dream" / "Torgersen"
+```
+
+Serwis ładuje model **i encoder** z BentoML store → preprocessing identyczny jak w pipeline.
+
+---
+
+## Wymagane screenshoty (1/2)
+
+| # | Screenshot | Co pokazuje |
+|---|-----------|-------------|
+| 1 | `dvc dag` | Graf pipeline'u z 5 etapami |
+| 2 | `dvc repro` | Pomyślne wykonanie wszystkich etapów |
+| 3 | MLflow UI — lista | Experiment z ≥ 20 runami |
+| 4 | MLflow UI — best-model | Parametry, metryki, model |
+
+---
+
+## Wymagane screenshoty (2/2)
+
+| # | Screenshot | Co pokazuje |
+|---|-----------|-------------|
+| 5 | `dvc metrics show` | accuracy i f1_score |
+| 6 | `dvc metrics diff` | Porównanie po zmianie params |
+| 7 | `bentoml models list` | penguins_classifier + encoder |
+| 8 | curl / Swagger UI | Odpowiedź z `/predict` |
+
+</textarea></section>
+</section>
+
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script>
+			Reveal.initialize({
+				hash: true,
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>

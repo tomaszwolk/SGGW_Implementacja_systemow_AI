@@ -1,0 +1,4 @@
+[core]
+    remote = zdalny
+['remote "zdalny"']
+    url = /Users/myszon/Projects/sggw_implementacja_ai_2026_03_07/sggw_implementacja_ai/dvc_remote

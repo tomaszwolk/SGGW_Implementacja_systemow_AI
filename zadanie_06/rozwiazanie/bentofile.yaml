@@ -1,0 +1,16 @@
+service: "service:TitanicTwoModelsService"
+description: "Klasyfikator Titanic z dwoma modelami (RF + LogReg)"
+labels:
+  owner: SGGW
+  project: titanic_bentoml_two_models
+include:
+  - "*.py"
+python:
+  packages:
+    - scikit-learn
+    - numpy
+    - pandas
+    - pydantic
+models:
+  - titanic_rf:latest
+  - titanic_logreg:latest

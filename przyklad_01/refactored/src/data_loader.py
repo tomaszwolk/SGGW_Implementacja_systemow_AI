@@ -39,3 +39,4 @@ class TitanicDataLoader:
         df = df.drop(columns=drop_columns)
 
         return df
+ 

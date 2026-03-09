@@ -49,7 +49,7 @@ def main():
             min_samples_split=min_samples_split,
             min_samples_leaf=min_samples_leaf,
             random_state=42,
-        )
+        ) 
 
         scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
         return scores.mean()

@@ -82,3 +82,4 @@ class TitanicPipeline:
             print(f"  {metric_name}: {value:.4f}")
 
         return metrics
+ 

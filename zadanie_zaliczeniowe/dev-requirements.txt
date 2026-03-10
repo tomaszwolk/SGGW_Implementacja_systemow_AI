@@ -1,0 +1,11 @@
+dvc==3.66.1
+mlflow==3.9.0
+optuna==4.2.1
+optuna-integration==4.2.1
+# Opcjonalnie do wizualizacji metryk:
+matplotlib==3.10.8
+seaborn==0.13.2
+plotly==6.0.1
+# Narzędzia developerskie:
+ipykernel==7.2.0
+python-dotenv==1.2.1

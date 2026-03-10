@@ -1,0 +1,52 @@
+stages:
+  download_data:
+    cmd: python -c "import yaml; from src.pipeline import PalmerPenguinsPipeline; config = yaml.safe_load(open('config/config.yaml')); PalmerPenguinsPipeline(config).run_download_data()"
+    deps:
+      - src/data_loader.py
+      - src/pipeline.py
+    outs:
+      - data/raw/penguins.csv
+
+  prepare_data:
+    cmd: python -c "import yaml; from src.pipeline import PalmerPenguinsPipeline; config = yaml.safe_load(open('config/config.yaml')); PalmerPenguinsPipeline(config).run_prepare_data()"
+    deps:
+      - data/raw/penguins.csv
+      - src/preprocessor.py
+      - src/pipeline.py
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - models/encoder.pkl
+
+  train_model:
+    cmd: python -c "import yaml; from src.pipeline import PalmerPenguinsPipeline; config = yaml.safe_load(open('config/config.yaml')); PalmerPenguinsPipeline(config).run_train_model()"
+    deps:
+      - data/processed/train.csv
+      - src/trainer.py
+      - src/pipeline.py
+    params:
+      - config/config.yaml:
+        - model.train_params.n_estimators
+        - model.train_params.max_depth
+        - model.train_params.min_samples_split
+        - model.train_params.min_samples_leaf
+        - model.train_params.n_trials
+    outs:
+      - models/model.pkl
+
+  evaluate_model:
+    cmd: python -c "import yaml; from src.pipeline import PalmerPenguinsPipeline; config = yaml.safe_load(open('config/config.yaml')); PalmerPenguinsPipeline(config).run_evaluate_model()"
+    deps:
+      - data/processed/test.csv
+      - models/model.pkl
+      - src/pipeline.py
+    metrics:
+      - metrics/metrics.json:
+          cache: false
+
+  register_bentoml:
+    cmd: python -c "import yaml; from src.pipeline import PalmerPenguinsPipeline; config = yaml.safe_load(open('config/config.yaml')); PalmerPenguinsPipeline(config).run_register_bentoml()"
+    deps:
+      - models/model.pkl
+      - models/encoder.pkl
+      - src/pipeline.py

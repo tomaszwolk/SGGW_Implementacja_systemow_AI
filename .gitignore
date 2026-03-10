@@ -3,3 +3,6 @@
 *.db
 **/mlruns
 dvc_remote/*
+**/data
+**/models
+dvc_storage/

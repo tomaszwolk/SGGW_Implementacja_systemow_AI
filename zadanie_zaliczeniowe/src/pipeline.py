@@ -165,3 +165,4 @@ class PalmerPenguinsPipeline:
         with mlflow.start_run(run_name="bentoml-registration"):
             mlflow.log_param("bento_model_tag", str(bento_model.tag))
             mlflow.log_param("bento_encoder_tag", str(bento_encoder.tag))
+    

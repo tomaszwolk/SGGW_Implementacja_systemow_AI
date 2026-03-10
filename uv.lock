@@ -1240,6 +1240,7 @@ dependencies = [
     { name = "bentoml" },
     { name = "dvc" },
     { name = "kaleido" },
+    { name = "less" },
     { name = "matplotlib" },
     { name = "mlflow" },
     { name = "numpy" },
@@ -1258,6 +1259,7 @@ requires-dist = [
     { name = "bentoml", specifier = "==1.4.35" },
     { name = "dvc", specifier = "==3.66.1" },
     { name = "kaleido", specifier = "==0.2.1" },
+    { name = "less", specifier = ">=0.0.1" },
     { name = "matplotlib", specifier = "==3.10.8" },
     { name = "mlflow", specifier = "==3.9.0" },
     { name = "numpy", specifier = "==2.4.2" },
@@ -1402,6 +1404,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b6/a5/607e533ed6c83ae1a696969b8e1c137dfebd5759a2e9682e26ff1b97740b/kombu-5.6.2.tar.gz", hash = "sha256:8060497058066c6f5aed7c26d7cd0d3b574990b09de842a8c5aaed0b92cc5a55", size = 472594, upload-time = "2025-12-29T20:30:07.779Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fb/0f/834427d8c03ff1d7e867d3db3d176470c64871753252b21b4f4897d1fa45/kombu-5.6.2-py3-none-any.whl", hash = "sha256:efcfc559da324d41d61ca311b0c64965ea35b4c55cc04ee36e55386145dace93", size = 214219, upload-time = "2025-12-29T20:30:05.74Z" },
+]
+
+[[package]]
+name = "less"
+version = "0.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "triad" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/09/93/f41e6d5d02feb2a27d40c0dfdd22f09f2a3cce1f2f66f0f4d111586ab784/less-0.0.1.tar.gz", hash = "sha256:d85e98f64b4abe64586af125117a42780e407fef8ccdbca509e8fd23f6375d14", size = 1701, upload-time = "2021-01-17T08:09:08.709Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/32/28/458485763c49714f368941c6d48e6196117337747e6a069283e66a3f0590/less-0.0.1-py3-none-any.whl", hash = "sha256:1041f5804d0e2f16bbeaab3bc96141f39bdb0cb8cc017797d47a8f8673bd6c18", size = 6067, upload-time = "2021-01-17T08:09:07.419Z" },
 ]
 
 [[package]]
@@ -2763,6 +2777,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/09/a9/6ba95a270c6f1fbcd8dac228323f2777d886cb206987444e4bce66338dd4/tqdm-4.67.3.tar.gz", hash = "sha256:7d825f03f89244ef73f1d4ce193cb1774a8179fd96f31d7e1dcde62092b960bb", size = 169598, upload-time = "2026-02-03T17:35:53.048Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/16/e1/3079a9ff9b8e11b846c6ac5c8b5bfb7ff225eee721825310c91b3b50304f/tqdm-4.67.3-py3-none-any.whl", hash = "sha256:ee1e4c0e59148062281c49d80b25b67771a127c85fc9676d3be5f243206826bf", size = 78374, upload-time = "2026-02-03T17:35:50.982Z" },
+]
+
+[[package]]
+name = "triad"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "fsspec" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1f/9b/7b446a8e617fde292e1628752c0578a6f6eba839f44411a8e71b7ba16ee3/triad-1.0.2.tar.gz", hash = "sha256:4fe0b7ab2e95105971b7db694c344dee4d207d335bf7ddb501f2cb9c09790be2", size = 54217, upload-time = "2026-02-11T02:45:08.617Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9a/3e/62fa4b370f7cc9b731004bcfe1ad8ef1e52478b38f5059eb69582fa8bb5a/triad-1.0.2-py3-none-any.whl", hash = "sha256:f95257e9047fbd19a924958c4b7f9b5c0cef3e28cc03adf3baec28e80dcf45d9", size = 59946, upload-time = "2026-02-11T02:45:07.197Z" },
 ]
 
 [[package]]

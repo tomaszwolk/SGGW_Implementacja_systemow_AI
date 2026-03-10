@@ -59,3 +59,4 @@ class PenguinService:
             "species": species_name,
             "confidence": round(confidence, 4),
         }
+    

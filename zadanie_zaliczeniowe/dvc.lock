@@ -1,29 +1,23 @@
 schema: '2.0'
 stages:
   download_data:
-    cmd: python -c "import yaml; from src.pipeline import 
-      PalmerPenguinsPipeline; config = 
-      yaml.safe_load(open('config/config.yaml')); 
-      PalmerPenguinsPipeline(config).run_download_data()"
+    cmd: python main.py download_data
     deps:
     - path: src/data_loader.py
       hash: md5
-      md5: 015af21c2706d93a76f04af6826f07a2
-      size: 518
+      md5: 6486be779769b90aeb18d138b80a1b5f
+      size: 524
     - path: src/pipeline.py
       hash: md5
-      md5: 8dc12d64c9ac75b177262a7ee2e8e050
-      size: 6594
+      md5: 1916e303638990a42dbb9232760d0f1c
+      size: 6598
     outs:
     - path: data/raw/penguins.csv
       hash: md5
       md5: 011a4b12c613a766747a35d799bfe18f
       size: 15360
   prepare_data:
-    cmd: python -c "import yaml; from src.pipeline import 
-      PalmerPenguinsPipeline; config = 
-      yaml.safe_load(open('config/config.yaml')); 
-      PalmerPenguinsPipeline(config).run_prepare_data()"
+    cmd: python main.py prepare_data
     deps:
     - path: data/raw/penguins.csv
       hash: md5
@@ -31,12 +25,12 @@ stages:
       size: 15360
     - path: src/pipeline.py
       hash: md5
-      md5: 8dc12d64c9ac75b177262a7ee2e8e050
-      size: 6594
+      md5: 1916e303638990a42dbb9232760d0f1c
+      size: 6598
     - path: src/preprocessor.py
       hash: md5
-      md5: 1db81c8997d82378ab20462b4b9757dc
-      size: 1872
+      md5: 877666660716a1a5535ae1389ab7e889
+      size: 1876
     outs:
     - path: data/processed/test.csv
       hash: md5
@@ -51,53 +45,31 @@ stages:
       md5: 80115da7a20a4f5edc2bc240ccde8165
       size: 1332
   train_model:
-    cmd: python -c "import yaml; from src.pipeline import 
-      PalmerPenguinsPipeline; config = 
-      yaml.safe_load(open('config/config.yaml')); 
-      PalmerPenguinsPipeline(config).run_train_model()"
+    cmd: python main.py train_model
     deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: a523b086a92b2839d4ecaaf15ce78daf
+      size: 840
     - path: data/processed/train.csv
       hash: md5
       md5: e041e6daa84396f9d94e58b2d8fac19f
       size: 13492
     - path: src/pipeline.py
       hash: md5
-      md5: 8dc12d64c9ac75b177262a7ee2e8e050
-      size: 6594
+      md5: 1916e303638990a42dbb9232760d0f1c
+      size: 6598
     - path: src/trainer.py
       hash: md5
-      md5: dc83e087bb27e5cbb51decfd5a25c24c
-      size: 4527
-    params:
-      config/config.yaml:
-        model.train_params.max_depth:
-        - max_depth
-        - 3
-        - 15
-        model.train_params.min_samples_leaf:
-        - min_samples_leaf
-        - 1
-        - 4
-        model.train_params.min_samples_split:
-        - min_samples_split
-        - 2
-        - 10
-        model.train_params.n_estimators:
-        - n_estimators
-        - 50
-        - 300
-        - 50
-        model.train_params.n_trials: 30
+      md5: fae8e797d098a621c3903abbc04693a0
+      size: 4531
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: ad7e1db691eaf1dfdb87c3a995ba93f9
-      size: 356769
+      md5: 15f56f55c3ca575a8a5f98b86f6da9ba
+      size: 230065
   evaluate_model:
-    cmd: python -c "import yaml; from src.pipeline import 
-      PalmerPenguinsPipeline; config = 
-      yaml.safe_load(open('config/config.yaml')); 
-      PalmerPenguinsPipeline(config).run_evaluate_model()"
+    cmd: python main.py evaluate_model
     deps:
     - path: data/processed/test.csv
       hash: md5
@@ -105,22 +77,19 @@ stages:
       size: 3492
     - path: models/model.pkl
       hash: md5
-      md5: ad7e1db691eaf1dfdb87c3a995ba93f9
-      size: 356769
+      md5: 15f56f55c3ca575a8a5f98b86f6da9ba
+      size: 230065
     - path: src/pipeline.py
       hash: md5
-      md5: 8dc12d64c9ac75b177262a7ee2e8e050
-      size: 6594
+      md5: 1916e303638990a42dbb9232760d0f1c
+      size: 6598
     outs:
     - path: metrics/metrics.json
       hash: md5
       md5: 23d0bacdc237a924c9fb5e99529b11af
       size: 53
   register_bentoml:
-    cmd: python -c "import yaml; from src.pipeline import 
-      PalmerPenguinsPipeline; config = 
-      yaml.safe_load(open('config/config.yaml')); 
-      PalmerPenguinsPipeline(config).run_register_bentoml()"
+    cmd: python main.py register_bentoml
     deps:
     - path: models/encoder.pkl
       hash: md5
@@ -128,9 +97,9 @@ stages:
       size: 1332
     - path: models/model.pkl
       hash: md5
-      md5: ad7e1db691eaf1dfdb87c3a995ba93f9
-      size: 356769
+      md5: 15f56f55c3ca575a8a5f98b86f6da9ba
+      size: 230065
     - path: src/pipeline.py
       hash: md5
-      md5: 8dc12d64c9ac75b177262a7ee2e8e050
-      size: 6594
+      md5: 1916e303638990a42dbb9232760d0f1c
+      size: 6598

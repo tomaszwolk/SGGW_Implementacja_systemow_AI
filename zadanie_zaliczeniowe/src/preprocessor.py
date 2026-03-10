@@ -53,3 +53,4 @@ class PenguinPreprocessor:
         """Wczytuje encoder z pliku .pkl."""
         self.encoder = joblib.load(filepath)
         self._is_fitted = True
+    

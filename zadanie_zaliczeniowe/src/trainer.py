@@ -56,15 +56,23 @@ class PenguinTrainer:
             scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
             return scores.mean()
         
-        mlflow.set_experiment(self.model_config["experiment_name"])
+        # Ustawiamy na początku aktywny eksperyment
+        experiment_name = self.model_config["experiment_name"]
+        mlflow.set_experiment(experiment_name)
 
+        # Tworzymy callback
         mlflow_callback = MLflowCallback(
             tracking_uri=mlflow.get_tracking_uri(),
-            metric_name="cv_accuracy"
+            metric_name="cv_accuracy",
         )
 
+        # Tworzymy study i optymalizujemy
         study = optuna.create_study(direction="maximize")
-        study.optimize(objective, n_trials=self.train_params["n_trials"], callbacks=[mlflow_callback])
+        study.optimize(
+            objective,
+            n_trials=self.train_params["n_trials"],
+            callbacks=[mlflow_callback]
+        )
 
         print(f"\nNajlepsze parametry: {study.best_params}")
         print(f"Najlepsza CV accuracy: {study.best_value:.4f}")
@@ -75,48 +83,36 @@ class PenguinTrainer:
         return self
 
     def evaluate_and_log(self, model, X_test: np.ndarray, y_test: np.ndarray) -> dict[str, float]:
+        """Metoda do końcowej ewaluacji i logowania modelu."""
+
+        # Obliczenie metryk
         y_pred = model.predict(X_test)
         metrics = {
             "test_accuracy": round(accuracy_score(y_test, y_pred), 4),
             "test_f1_score": round(f1_score(y_test, y_pred, average="weighted"), 4)
 
         }
-
         print(f"Metrics: {metrics}")
 
-        signature = infer_signature(X_test, y_pred) # Tworzenie sygnatury
+        # Tworzenie sygnatury
+        signature = infer_signature(X_test, y_pred)
 
+        # Logowanie do MLflow
         mlflow.set_experiment(self.model_config["experiment_name"])
         with mlflow.start_run(run_name="best-model"):
+            # Logowanie metryk testowych
             mlflow.log_metrics(metrics)
+            # Logujemy wszystkie parametry modelu (z Optuny i sklearn)
             mlflow.log_params(model.get_params()) 
 
             # Logujemy model z sygnaturą
             mlflow.sklearn.log_model(
                 sk_model=model,
-                artifact_path="model",
+                name="model",
                 signature=signature
             )
+
+            # Logowanie taga
+            mlflow.set_tag("stage", "production_candidate")
 
         return metrics
-
-    def save_model(self, filepath: str): # DELETE?
-        """Zapisuje wyuczony model do pliku .pkl"""
-        joblib.dump(self.best_model, filepath)
-
-    def log_best_model(self, model, X_test: np.ndarray, y_test: np.ndarray):
-        y_pred = model.predict(X_test)
-        signature = infer_signature(X_test, y_pred) # Tworzenie sygnatury
-
-        # Logowanie do tego samego eksperymentu
-        mlflow.set_experiment(self.model_config["experiment_name"])
-        
-        with mlflow.start_run(run_name="best-model-final"):
-            mlflow.log_params(model.get_params()) 
-            
-            # Logujemy model z sygnaturą
-            mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="model",
-                signature=signature
-            )

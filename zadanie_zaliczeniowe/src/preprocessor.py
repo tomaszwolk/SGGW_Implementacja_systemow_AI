@@ -7,11 +7,11 @@ class PenguinPreprocessor:
     """Klasa do wstępnego przetwarzania danych Palmer Penguins."""
 
     def __init__(self, categorical_cols: list = None):
-        self.categorical_cols = categorical_cols or ["species", "island"]
+        self.categorical_cols = categorical_cols or ["sex", "island"]
         self.encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
         self._is_fitted = False
 
-    def fit(self, X: pd.DataFrame):
+    def fit(self, X: pd.DataFrame, y=None):
         """Uczy się parametrów transformacji na podstawie danych treningowych.
 
         Argumenty:
@@ -48,12 +48,6 @@ class PenguinPreprocessor:
         df_clean_encoded = pd.concat([df_num, df_encoded], axis=1)
 
         return df_clean_encoded
-
-    def save_model(self, filepath: str): # DELETE ?
-        """Zapisuje wyuczony encoder do pliku .pkl"""
-        if not self._is_fitted:
-            raise RuntimeError("Nie można zapisać nienauczonego enkodera.")
-        joblib.dump(self.encoder, filepath)
 
     def load_encoder(self, filepath: str):
         """Wczytuje encoder z pliku .pkl."""

@@ -15,7 +15,7 @@ def main():
     pipeline.run_prepare_data()
     pipeline.run_train_model()
     pipeline.run_evaluate_model()
-
+    pipeline.run_register_bentoml()
 
 if __name__ == "__main__":
     main()

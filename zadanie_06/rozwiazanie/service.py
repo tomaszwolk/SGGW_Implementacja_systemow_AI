@@ -46,3 +46,4 @@ class TitanicTwoModelsService:
     @bentoml.api()
     def predict_logreg(self, features: TitanicFeatures) -> dict:
         return self._predict(self.logreg, "LogisticRegression", features)
+ 

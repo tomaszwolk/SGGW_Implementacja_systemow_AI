@@ -1,8 +1,12 @@
 import json
 import joblib
 import pandas as pd
+import bentoml
+import mlflow
+
 from pathlib import Path
 from sklearn.model_selection import train_test_split
+
 from .data_loader import PalmerPenguinsDataLoader
 from .preprocessor import PenguinPreprocessor
 from .trainer import PenguinTrainer
@@ -48,17 +52,12 @@ class PalmerPenguinsPipeline:
     def _save_model(self, model: PenguinPreprocessor | PenguinTrainer, config_path_key: str) -> Path:
         """Prywatna metoda pomocnicza do zapisu encodera."""
         # Pobieramy ścieżkę
-        # if type(model) is PenguinPreprocessor:
-        #     rel_path = self.config["preprocessing"]["encoder_path"]
-        # else:
-        #     rel_path = self.config["model"]["rf_model_path"]
         if config_path_key in self.config["preprocessing"]:
             rel_path = self.config["preprocessing"]["encoder_path"]
         else:
             rel_path = self.config["model"]["rf_model_path"]
         full_path = self._get_full_path(rel_path)
 
-        # model.save_model(full_path)
         joblib.dump(model, full_path)
 
         return full_path
@@ -91,9 +90,8 @@ class PalmerPenguinsPipeline:
 
     def run_prepare_data(self):
         print("Preprocessing i zapis encodera.")
-        raw_data_rel_path = self.config["data"]["raw_data_path"]
-        full_path = self._get_full_path(raw_data_rel_path)
-        df_raw = pd.read_csv(full_path)
+        full_raw_data_path = self._get_full_path(self.config["data"]["raw_data_path"])
+        df_raw = pd.read_csv(full_raw_data_path)
         df = df_raw.dropna().copy()
 
         print("Split danych na train / test.")
@@ -112,14 +110,12 @@ class PalmerPenguinsPipeline:
         # Zapis
         X_train_trans_saved_path = self._save_data(pd.concat([X_train_trans, y_train], axis=1), "train_data_path")
         X_test_trans_saved_path = self._save_data(pd.concat([X_test_trans, y_test], axis=1), "test_data_path")
-        print(f"Dane przeprocesowane zapisane do: {X_train_trans_saved_path} i {X_test_trans_saved_path}")
+        print(f"Dane przeprocesowane zapisane do: \n\t\t{X_train_trans_saved_path}\n\t\t{X_test_trans_saved_path}")
 
     def run_train_model(self):
         # Wczytanie danych treningowych
-        train_data_rel_path = self.config["data"]["train_data_path"]
-        full_path = self._get_full_path(train_data_rel_path)
-        df = pd.read_csv(full_path)
-        print("Wczytano dane treningowe.")
+        full_train_data_path = self._get_full_path(self.config["data"]["train_data_path"])
+        df = pd.read_csv(full_train_data_path)
         X_train = df.drop(columns=self.target)
         y_train = df[self.target]
 
@@ -131,22 +127,41 @@ class PalmerPenguinsPipeline:
 
     def run_evaluate_model(self):
         # Wczytanie danych
-        test_data_rel_path = self.config["data"]["test_data_path"]
-        full_path = self._get_full_path(test_data_rel_path)
-        df_test = pd.read_csv(full_path)
-        print("Wczytano dane testowe.")
+        full_test_path = self._get_full_path(self.config["data"]["test_data_path"])
+        df_test = pd.read_csv(full_test_path)
         X_test = df_test.drop(columns=self.target)
         y_test = df_test[self.target]
 
-        # Wczytanie modelu
-        model_rel_path = self.config["model"]["rf_model_path"]
-        model_path = self._get_full_path(model_rel_path)
+        # Wczytanie modelu z pliku
+        model_path = self._get_full_path(self.config["model"]["rf_model_path"])
         model = joblib.load(model_path)
-        print(f"Wczytano model z: {model_path}")
+        print(f"Wczytano model do ewaluacji z: {model_path}")
 
         # Ewaluacja modelu
         trainer = PenguinTrainer(self.config)
         metrics = trainer.evaluate_and_log(model, X_test, y_test)
-        full_path = self._to_json(metrics, "metrics_path")
-        print(f"Metryki zapisane w: {full_path}")
 
+        # Zapis metryk do .json
+        full_metrics_path = self._to_json(metrics, "metrics_path")
+        print(f"Metryki zapisane w: {full_metrics_path}")
+
+    def run_register_bentoml(self):
+        # Wczytywanie modelu i enkoder z plików .pkl
+        model_path = self._get_full_path(self.config["model"]["rf_model_path"])
+        encoder_path = self._get_full_path(self.config["preprocessing"]["encoder_path"])
+
+        model = joblib.load(model_path)
+        encoder = joblib.load(encoder_path)
+
+        # Zapis modeli do Model Store BentoML
+        bento_model = bentoml.sklearn.save_model("penguins_classifier", model)
+        bento_encoder = bentoml.sklearn.save_model("penguins_encoder", encoder.encoder)
+
+        print(f"Zarejestrowano model: {bento_model}")
+        print(f"Zarejestrowano encoder: {bento_encoder}")
+
+        # Dodanie logów do MLflow o rejestracji
+        mlflow.set_experiment(self.config["model"]["experiment_name"])
+        with mlflow.start_run(run_name="bentoml-registration"):
+            mlflow.log_param("bento_model_tag", str(bento_model.tag))
+            mlflow.log_param("bento_encoder_tag", str(bento_encoder.tag))

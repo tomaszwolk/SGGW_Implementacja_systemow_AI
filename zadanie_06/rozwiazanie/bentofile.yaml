@@ -14,3 +14,4 @@ python:
 models:
   - titanic_rf:latest
   - titanic_logreg:latest
+ 

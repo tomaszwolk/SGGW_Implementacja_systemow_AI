@@ -49,8 +49,8 @@ stages:
     deps:
     - path: config/config.yaml
       hash: md5
-      md5: 03206f8b4f96490c622f4effe91d0a6f
-      size: 840
+      md5: c9d68a932ec7152aca7ff46ed3e77e31
+      size: 839
     - path: data/processed/train.csv
       hash: md5
       md5: e041e6daa84396f9d94e58b2d8fac19f
@@ -66,8 +66,8 @@ stages:
     outs:
     - path: models/model.pkl
       hash: md5
-      md5: 93a75ba6a9fa1726caf679dae3c7f9bb
-      size: 345505
+      md5: f4e3c339c1f46bd3038eb337b8fcc6a2
+      size: 152961
   evaluate_model:
     cmd: python main.py evaluate_model
     deps:
@@ -77,8 +77,8 @@ stages:
       size: 3492
     - path: models/model.pkl
       hash: md5
-      md5: 93a75ba6a9fa1726caf679dae3c7f9bb
-      size: 345505
+      md5: f4e3c339c1f46bd3038eb337b8fcc6a2
+      size: 152961
     - path: src/pipeline.py
       hash: md5
       md5: 1916e303638990a42dbb9232760d0f1c
@@ -86,8 +86,8 @@ stages:
     outs:
     - path: metrics/metrics.json
       hash: md5
-      md5: 23d0bacdc237a924c9fb5e99529b11af
-      size: 53
+      md5: 1a20c7a9dda23d39ac7acced5cb59136
+      size: 59
   register_bentoml:
     cmd: python main.py register_bentoml
     deps:
@@ -97,8 +97,8 @@ stages:
       size: 1332
     - path: models/model.pkl
       hash: md5
-      md5: 93a75ba6a9fa1726caf679dae3c7f9bb
-      size: 345505
+      md5: f4e3c339c1f46bd3038eb337b8fcc6a2
+      size: 152961
     - path: src/pipeline.py
       hash: md5
       md5: 1916e303638990a42dbb9232760d0f1c
